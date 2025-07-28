@@ -37,29 +37,6 @@ Edit
 python examples/thin_line_statevector.py
 Or open and run notebooks:
 
-bash
-Copy
-Edit
-jupyter notebook examples/
-📦 Repository Structure
-kotlin
-Copy
-Edit
-MK-Model-TLTOE/
-│
-├── README.md
-├── requirements.txt
-├── mkmodel/
-│   ├── __init__.py
-│   ├── thin_line.py
-│   └── ... (core modules)
-├── examples/
-│   ├── thin_line_statevector.ipynb
-│   └── ...
-├── data/
-│   └── ...
-└── docs/
-    └── ...
 🔗 Quick Download Links
 Download ZIP (no Git needed)
 
