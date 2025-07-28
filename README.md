@@ -23,7 +23,7 @@ Consciousness: The observer as an active participant on the thin line, co-creati
 A modular toolkit for thin line modeling and related computational experiments.
 
 ## Project Structure
-
+...  
 mkmodel-template/
 ├── src/
 │   ├── quantum_circuit.py
@@ -56,7 +56,7 @@ mkmodel-template/
 ├── CITATION.cff
 ├── README.md
 └── requirements.txt
-
+...
 
 For further questions or contributions, please open an issue or pull request.
 Features
