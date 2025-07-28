@@ -1,0 +1,7 @@
+git init mkmodel
+cd mkmodel
+echo "# MK Model" > README.md
+mkdir src data notebooks docs tests mkmodel
+# Add your code, CSVs, notebooks, docs here
+git add .
+git commit -m "Initial commit: MK Model core files"
