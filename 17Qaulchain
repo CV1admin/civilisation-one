@@ -1,0 +1,81 @@
+🚀 Quantime (QTM) Token Deployment Guide
+This guide will walk you through deploying your Quantime ERC-20 smart contract to the Sepolia Ethereum testnet using Remix and MetaMask.
+
+## Prerequisites
+Before you begin, make sure you have the following set up:
+
+MetaMask Wallet: Install the MetaMask browser extension and create a wallet.
+
+Sepolia Test ETH: You'll need some Sepolia ETH to pay for the deployment (gas fees). You can get this for free from a "faucet":
+
+sepoliafaucet.com
+
+infura.io/faucet/sepolia
+
+## Step 1: Set Up the Contract in Remix
+Remix is a web-based IDE for writing and deploying smart contracts.
+
+Open Remix: Go to remix.ethereum.org.
+
+Create a New File: In the File Explorer tab, create a new file named Quantime.sol.
+
+Paste the Code: Copy and paste your complete Quantime contract code into this file. Remix will automatically import the OpenZeppelin contracts.
+
+## Step 2: Compile the Smart Contract
+Next, you need to compile the Solidity code into bytecode that the Ethereum Virtual Machine (EVM) can understand.
+
+Go to the Compiler Tab: On the left-hand sidebar, navigate to the Solidity Compiler tab.
+
+Select the Compiler Version: Choose a compiler version that matches the one in your code (0.8.20 or higher).
+
+Compile: Click the Compile Quantime.sol button.
+
+If everything is correct, you'll see a green checkmark, indicating a successful compilation.
+
+## Step 3: Deploy the Contract
+Now it's time to deploy your contract to the Sepolia testnet.
+
+Go to the Deploy Tab: Navigate to the Deploy & Run Transactions tab.
+
+Set the Environment:
+
+In the ENVIRONMENT dropdown, select Injected Provider - MetaMask.
+
+This will prompt your MetaMask wallet to connect to Remix. Approve the connection. Make sure your MetaMask is set to the Sepolia network.
+
+Configure the Deployment:
+
+Under the CONTRACT dropdown, make sure Quantime is selected.
+
+Next to the Deploy button, there is an input field for the initialSupply. Enter the amount of QTM you want to create. For 1 billion tokens, enter 1000000000.
+
+Deploy: Click the Deploy button.
+
+Confirm in MetaMask: MetaMask will pop up with a transaction confirmation. Review the gas fee and click Confirm.
+
+After a few moments, the transaction will be confirmed on the blockchain. You'll see your deployed contract appear under the "Deployed Contracts" section in Remix.
+
+## Step 4: Interact with Your Deployed Token
+You can now interact with your live QTM token contract directly from Remix.
+
+Copy the Contract Address: Click the copy icon next to your deployed contract in Remix to get its address.
+
+Add Token to MetaMask:
+
+Open MetaMask, go to the Tokens tab, and click Import tokens.
+
+Paste the contract address. The symbol (QTM) and decimals (18) should auto-fill.
+
+Click Add custom token, and you will see your initial supply of 1,000,000,000 QTM in your wallet!
+
+Use Contract Functions in Remix:
+
+balanceOf: Enter your wallet address to check your QTM balance.
+
+transfer: Send some QTM to another address.
+
+mint: As the owner, you can mint new tokens for any address.
+
+burn: Destroy some of your own tokens.
+
+Congratulations! You have successfully deployed and tested your Quantime (QTM) ERC-20 token on the Sepolia testnet.
