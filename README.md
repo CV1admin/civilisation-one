@@ -195,3 +195,37 @@ GitHub: CV1admin
 Open for research, education, and non-commercial collaboration. Cite the MK Model and TLTOE in derivative works.
 
 The boundary is not the end—it’s the birthplace of structure. Welcome to the Thin Line.
+
+## MK Core Simulation Package
+
+The repository now includes a lightweight `mkcore` Python package that captures the core feedback loop described by the Thin-Line Theory of Everything. The implementation focuses on:
+
+- Preparing uniform superposition states and applying Hadamard/controlled entanglement dynamics.
+- Sampling measurement statistics and transforming them into spectra.
+- Detecting spectral patterns through an adaptive decoder and feeding the response back into the system.
+
+### Quick Start
+
+1. **Install dependencies**
+
+   The core module is implemented with the Python standard library. Optionally install `pytest` to run the automated tests.
+
+   ```bash
+   pip install pytest
+   ```
+
+2. **Run the demonstration script**
+
+   ```bash
+   python main.py
+   ```
+
+   This prints a step-by-step report with the inferred pattern state and diagnostic peak ratios.
+
+3. **Execute the test suite**
+
+   ```bash
+   pytest
+   ```
+
+   The tests cover state preparation, measurement utilities, and the orchestration loop.
