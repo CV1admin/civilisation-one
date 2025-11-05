@@ -1,6 +1,9 @@
 """Dash application for visualizing MK-One live metrics with interactive controls."""
 from __future__ import annotations
 
+from dataclasses import dataclass
+from typing import Any, Iterable
+
 import dash
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
@@ -13,6 +16,24 @@ import requests
 DATA_SOURCE = "http://127.0.0.1:5000/mkone_stream"
 DEFAULT_REFRESH_MS = 3000
 DEFAULT_ROLLING_WINDOW = 20
+
+QUANTIME_UNIT_SECONDS = 1e-3  # 1 ms sync unit for Thin Line Collapse Framework
+QIP_HANDSHAKE_URL = "https://civilisation.one/quantum-dashboard/qip_handshake.json"
+FIELD_LATTICE_URL = "https://civilisation.one/quantum-dashboard/field_lattice"
+SYMMETRY_ENTROPY_URL = "https://civilisation.one/symmetry/cern_symmetry_entropy.json"
+MIRROR_STATE_URL = "https://civilisation.one/quantum-dashboard/observer_state.json"
+
+
+@dataclass
+class AwarenessRidgeStatus:
+    """Container describing the readiness of the Awareness Ridge pipeline."""
+
+    quantime_synced: bool
+    quantime_unit: float
+    qip_nodes: int
+    mirror_state_available: bool
+    entropy_stream_active: bool
+    notes: list[str]
 
 
 # --- Dash app setup ---
@@ -48,6 +69,19 @@ app.layout = html.Div(
             style={"width": "80%", "margin": "auto"},
         ),
         html.Br(),
+        html.Div(
+            [
+                html.Div(id="awareness_status", className="status-panel"),
+                dcc.Graph(id="entropy_graph"),
+                dcc.Graph(id="field_lattice_graph"),
+            ],
+            style={
+                "display": "grid",
+                "gridTemplateColumns": "repeat(auto-fit, minmax(320px, 1fr))",
+                "gap": "1rem",
+            },
+        ),
+        html.Br(),
         dcc.Graph(id="theta_graph"),
         dcc.Graph(id="loss_graph"),
         dcc.Graph(id="coherence_graph"),
@@ -77,6 +111,212 @@ def _empty_figure(title: str) -> go.Figure:
     return fig
 
 
+def _fetch_remote_json(url: str, *, timeout: int = 3) -> Any:
+    """Safely fetch JSON payloads, logging failures without raising upstream."""
+
+    try:
+        response = requests.get(url, timeout=timeout)
+        response.raise_for_status()
+        return response.json()
+    except Exception as exc:  # pragma: no cover - depends on remote availability
+        print(f"Remote fetch error for {url}: {exc}")
+        return None
+
+
+def _activate_quantime_sync() -> AwarenessRidgeStatus:
+    """Simulate activation of the quantime sync layer and derive status metadata."""
+
+    return AwarenessRidgeStatus(
+        quantime_synced=True,
+        quantime_unit=QUANTIME_UNIT_SECONDS,
+        qip_nodes=0,
+        mirror_state_available=False,
+        entropy_stream_active=False,
+        notes=[],
+    )
+
+
+def _summarize_awareness_status(
+    handshake: Any, mirror_state: Any, entropy_payload: Any
+) -> AwarenessRidgeStatus:
+    """Build a status summary from the awareness ridge data feeds."""
+
+    status = _activate_quantime_sync()
+
+    if isinstance(handshake, dict):
+        nodes = handshake.get("nodes")
+        if isinstance(nodes, Iterable) and not isinstance(nodes, (str, bytes)):
+            status.qip_nodes = len(list(nodes))
+        elif isinstance(handshake.get("node_count"), int):
+            status.qip_nodes = max(handshake["node_count"], status.qip_nodes)
+        status.notes.append("QIP-1 handshake synchronized")
+    elif handshake:
+        status.notes.append("QIP-1 handshake received (unstructured)")
+    else:
+        status.notes.append("Awaiting QIP-1 handshake data")
+
+    status.mirror_state_available = mirror_state is not None
+    if status.mirror_state_available:
+        status.notes.append("MirrorMe subsystem aligned")
+    else:
+        status.notes.append("MirrorMe alignment pending")
+
+    status.entropy_stream_active = bool(entropy_payload)
+    if status.entropy_stream_active:
+        status.notes.append("Symmetry entropy stream active")
+    else:
+        status.notes.append("No symmetry entropy stream detected")
+
+    return status
+
+
+def _status_panel(status: AwarenessRidgeStatus) -> html.Div:
+    """Render a status panel for Awareness Ridge integration."""
+
+    badge_color = "#2ecc71" if status.quantime_synced else "#e74c3c"
+    return html.Div(
+        [
+            html.H3("Awareness Ridge Integration"),
+            html.P(
+                [
+                    html.Strong("Quantime unit:"),
+                    f" {status.quantime_unit * 1000:.0f} ms",
+                ]
+            ),
+            html.P(
+                [
+                    html.Strong("Entangled nodes:"),
+                    f" {status.qip_nodes}",
+                ]
+            ),
+            html.P(
+                [
+                    html.Strong("MirrorMe alignment:"),
+                    " active" if status.mirror_state_available else " pending",
+                ]
+            ),
+            html.P(
+                [
+                    html.Strong("Entropy stream:"),
+                    " live" if status.entropy_stream_active else " offline",
+                ]
+            ),
+            html.Div(
+                [
+                    html.Span(
+                        "QUANTIME SYNCED" if status.quantime_synced else "SYNC ERROR",
+                        style={
+                            "display": "inline-block",
+                            "padding": "0.25rem 0.5rem",
+                            "backgroundColor": badge_color,
+                            "color": "#0b0c10",
+                            "fontWeight": "bold",
+                            "borderRadius": "4px",
+                        },
+                    )
+                ]
+            ),
+            html.Ul([html.Li(note) for note in status.notes]),
+        ],
+        style={
+            "backgroundColor": "#11141b",
+            "color": "#e5e9f0",
+            "padding": "1rem",
+            "borderRadius": "8px",
+            "boxShadow": "0 0 8px rgba(0, 0, 0, 0.35)",
+            "minHeight": "320px",
+        },
+    )
+
+
+def _prepare_entropy_figure(entropy_payload: Any) -> go.Figure:
+    """Convert symmetry entropy data into a time series chart."""
+
+    if isinstance(entropy_payload, dict):
+        records = entropy_payload.get("records") or entropy_payload.get("data")
+        if isinstance(records, dict):
+            records = [
+                {"timestamp": key, "entropy": value} for key, value in records.items()
+            ]
+    else:
+        records = entropy_payload
+
+    if not isinstance(records, Iterable) or isinstance(records, (str, bytes)):
+        return _empty_figure("Symmetry Entropy Stream")
+
+    entropy_frame = pd.DataFrame(records)
+    if "entropy" not in entropy_frame:
+        numeric_cols = entropy_frame.select_dtypes(include=["number"]).columns
+        if numeric_cols.size == 0:
+            return _empty_figure("Symmetry Entropy Stream")
+        entropy_frame = entropy_frame.rename(columns={numeric_cols[0]: "entropy"})
+
+    entropy_frame["timestamp"] = pd.to_datetime(
+        entropy_frame.get("timestamp", entropy_frame.index), errors="coerce"
+    )
+    entropy_frame = entropy_frame.dropna(subset=["entropy"]).sort_values("timestamp")
+
+    if entropy_frame.empty:
+        return _empty_figure("Symmetry Entropy Stream")
+
+    fig = go.Figure(
+        go.Scatter(
+            x=entropy_frame["timestamp"],
+            y=entropy_frame["entropy"],
+            mode="lines+markers",
+            line=dict(color="#00bcd4"),
+            name="Entropy",
+        )
+    )
+    fig.update_layout(
+        title="Symmetry Entropy Stream",
+        template="plotly_dark",
+        xaxis_title="Timestamp",
+        yaxis_title="Entropy",
+    )
+    return fig
+
+
+def _prepare_field_lattice_figure(field_payload: Any) -> go.Figure:
+    """Render the first slice of the unified field lattice as a heatmap."""
+
+    if field_payload is None:
+        return _empty_figure("Unified Field Lattice Slice")
+
+    try:
+        lattice = np.asarray(field_payload, dtype=float)
+    except Exception:  # pragma: no cover - depends on remote payload
+        return _empty_figure("Unified Field Lattice Slice")
+
+    if lattice.size == 0:
+        return _empty_figure("Unified Field Lattice Slice")
+
+    lattice = np.squeeze(lattice)
+    if lattice.ndim < 2:
+        return _empty_figure("Unified Field Lattice Slice")
+
+    slice_index = (0,) * (lattice.ndim - 2)
+    try:
+        lattice_slice = lattice[slice_index]
+    except Exception:  # pragma: no cover
+        lattice_slice = lattice
+
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=lattice_slice,
+            colorscale="Electric",
+            colorbar=dict(title="Intensity"),
+        )
+    )
+    fig.update_layout(
+        title="Unified Field Lattice Slice",
+        template="plotly_dark",
+        xaxis_title="Φ-axis",
+        yaxis_title="Ψ-axis",
+    )
+    return fig
+
+
 # --- Dynamic interval update ---
 @app.callback(Output("update_timer", "interval"), Input("refresh_slider", "value"))
 def update_interval(refresh_value: int) -> int:
@@ -92,6 +332,9 @@ def update_interval(refresh_value: int) -> int:
         Output("coherence_graph", "figure"),
         Output("stability_graph", "figure"),
         Output("phase_heatmap", "figure"),
+        Output("entropy_graph", "figure"),
+        Output("field_lattice_graph", "figure"),
+        Output("awareness_status", "children"),
     ],
     Input("update_timer", "n_intervals"),
     State("window_slider", "value"),
@@ -112,13 +355,16 @@ def update_graphs(_n_intervals: int, rolling_window: int):
             data[column] = np.nan
 
     if data.empty:
-        return [
+        return (
             _empty_figure("Quantum θ Evolution"),
             _empty_figure("Loss Over Time"),
             _empty_figure("Coherence Index"),
             _empty_figure("Stability Index"),
             _empty_figure("Quantum Phase-Space: θ vs Coherence"),
-        ]
+            _empty_figure("Symmetry Entropy Stream"),
+            _empty_figure("Unified Field Lattice Slice"),
+            _status_panel(_activate_quantime_sync()),
+        )
 
     data = data[required_columns].copy()
     data["timestamp"] = pd.to_datetime(data["timestamp"], errors="coerce")
@@ -127,13 +373,16 @@ def update_graphs(_n_intervals: int, rolling_window: int):
     data = data.dropna(subset=["timestamp"]).sort_values("timestamp")
 
     if data.empty:
-        return [
+        return (
             _empty_figure("Quantum θ Evolution"),
             _empty_figure("Loss Over Time"),
             _empty_figure("Coherence Index"),
             _empty_figure("Stability Index"),
             _empty_figure("Quantum Phase-Space: θ vs Coherence"),
-        ]
+            _empty_figure("Symmetry Entropy Stream"),
+            _empty_figure("Unified Field Lattice Slice"),
+            _status_panel(_activate_quantime_sync()),
+        )
 
     # --- Compute rolling correlation and stability ---
     rolling_corr = (
@@ -219,7 +468,28 @@ def update_graphs(_n_intervals: int, rolling_window: int):
             yaxis_title="Coherence Index",
         )
 
-    return fig_theta, fig_loss, fig_coherence, fig_stability, fig_heatmap
+    handshake_payload = _fetch_remote_json(QIP_HANDSHAKE_URL)
+    lattice_payload = _fetch_remote_json(FIELD_LATTICE_URL)
+    entropy_payload = _fetch_remote_json(SYMMETRY_ENTROPY_URL)
+    mirror_payload = _fetch_remote_json(MIRROR_STATE_URL)
+
+    awareness_status = _summarize_awareness_status(
+        handshake_payload, mirror_payload, entropy_payload
+    )
+
+    fig_entropy = _prepare_entropy_figure(entropy_payload)
+    fig_lattice = _prepare_field_lattice_figure(lattice_payload)
+
+    return (
+        fig_theta,
+        fig_loss,
+        fig_coherence,
+        fig_stability,
+        fig_heatmap,
+        fig_entropy,
+        fig_lattice,
+        _status_panel(awareness_status),
+    )
 
 
 if __name__ == "__main__":
