@@ -1,0 +1,12 @@
+Crystal Name: TC-3  
+Base Frequency (Hz): 10,000  
+Temporal Period Doubling: 2  
+Energy Stability (eV): 3.3×10⁻⁶  
+Symmetry: Discrete Time Crystalline
+
+Crystal Name,Base Frequency (Hz),Temporal Period Doubling,Energy Stability (eV),Symmetry
+TC-1,1000,2,1.0e-6,Discrete Time Translational
+TC-2,5000,4,2.5e-6,Z2 Broken
+TC-3,10000,2,3.3e-6,Discrete Time Crystalline
+TC-4,20000,8,1.2e-6,Z4 Broken
+TC-5,50000,16,9.5e-6,High-Order Subharmonic
