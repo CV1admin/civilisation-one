@@ -299,3 +299,48 @@ It modifies dynamics by:
 - suppressing large-scale structure
 
 Resulting in a **nonlinear competition between order and information**.
+
+---
+
+## 🔧 Critical Improvements (Research-Grade Roadmap)
+
+To move from a runnable scaffold to research-grade infrastructure, prioritize the following:
+
+1. **Make the PDE explicit in implementation**
+   - Use a clearly defined evolution equation of the form
+     `∂t Ξ = D∇²Ξ − ∂V/∂Ξ + λ I(Ξ)`.
+   - Implement and document `potential_grad(Ξ)` explicitly.
+
+2. **Enforce explicit-Euler stability constraints**
+   - Track spatial spacing `dx` in the field object.
+   - Enforce/validate CFL-like diffusion condition: `dt ≤ dx²/(2D)`.
+
+3. **Use local (not purely global) information coupling**
+   - Avoid adding one global entropy scalar uniformly to all points.
+   - Prefer spatially resolved entropy/information density coupling.
+
+4. **Define boundary conditions explicitly**
+   - Use an explicit stencil and BC choice (e.g., periodic via `np.roll`).
+   - Keep BC assumptions consistent across analysis and verification.
+
+5. **Connect the quantum layer to field state**
+   - If quantum routines exist, map field state → circuit initialization/observables.
+   - Avoid disconnected “toy” circuits that do not consume simulation state.
+
+6. **Expose experiment controls via API**
+   - Add runtime configuration endpoints for key parameters (`dt`, `D`, `λ`, etc.).
+   - Keep run metadata for reproducibility.
+
+7. **Track richer observables than mean alone**
+   - Record time series of mean, variance, and energy-like quantities.
+   - Use these diagnostics for phase behavior and regression testing.
+
+---
+
+## 🎯 Recommended Next Validation Target
+
+Before extending model complexity, reproduce the **1D diffusion baseline**:
+
+`∂t u = D∇²u`
+
+If the solver does not recover this limit quantitatively, higher-level interpretations are not reliable.
