@@ -34,3 +34,8 @@ jobs:
       - name: Check free energy monotonicity (full verification)
         run: |
           python tests/test_free_energy.py
+
+      - name: Test quantum-classical bridge
+        run: |
+          python -m pytest tests/test_quantum_bridge.py -v
+
