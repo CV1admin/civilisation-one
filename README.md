@@ -181,6 +181,17 @@ When modifying this model:
 
 ---
 
+### Clamp policy (important)
+
+By default, keep the field **unclamped** to preserve the model’s symmetric double-well dynamics (±Ξ).
+
+```python
+# default (symmetry-preserving)
+# xi_new = np.clip(xi_new, 0.0, None)
+```
+
+If clamping is enabled, interpret Ξ as a non-negative density-like state variable instead of a signed order parameter.
+
 ## 🔁 Reproducibility Contract
 
 Each run is defined by:
@@ -273,6 +284,22 @@ evo.step()
 
 ```python
 xi = evo.field_obj.field
+```
+
+---
+
+## ✅ Test Suite (Recommended Next Step)
+
+Create a `tests/` directory with physics-based checks:
+
+- `test_diffusion.py`: verify `σ²(t) ≈ 2Dt` in the baseline diffusion regime
+- `test_energy.py`: verify free energy `F(t)` is monotonically non-increasing
+- `test_stability.py`: verify CFL-respecting runs do not blow up
+
+Run with:
+
+```bash
+pytest -q
 ```
 
 ---
