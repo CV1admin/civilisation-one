@@ -337,6 +337,26 @@ To move from a runnable scaffold to research-grade infrastructure, prioritize th
 
 ---
 
+## 🤖 Agent Constraints (AGENTS.md)
+
+Contributors extending this system should follow strict invariants:
+
+- Preserve mass conservation
+- Preserve free-energy monotonicity
+- Do not introduce non-local interactions unless explicitly defined
+
+Extension policy:
+
+- New physics should be added as a new module rather than by mutating core dynamics
+- Quantum-layer extensions must preserve unitarity
+- Every extension must include at least one verification test
+
+Allowed extension directions:
+
+- Higher dimensions (2D/3D)
+- Coupled fields
+- External constant calibration (EM spectrum, α, etc.)
+
 ## 🎯 Recommended Next Validation Target
 
 Before extending model complexity, reproduce the **1D diffusion baseline**:
