@@ -1,2 +1,2 @@
-numpy>=1.24
-matplotlib>=3.8
+# Optional plotting dependency for scripts/plot_phase_diagram.py
+# matplotlib>=3.8

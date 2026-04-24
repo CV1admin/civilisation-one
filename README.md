@@ -364,3 +364,32 @@ Before extending model complexity, reproduce the **1D diffusion baseline**:
 `∂t u = D∇²u`
 
 If the solver does not recover this limit quantitatively, higher-level interpretations are not reliable.
+
+---
+
+## 🤖 Automated Coding + Physics Loop (Minimal Runnable)
+
+A minimal self-optimizing loop is included to make model iteration executable:
+
+1. Generate candidate parameterization (`delta`) for cosmology extension
+2. Run simulation (`h_mkone(z, delta)`)
+3. Evaluate fitness against LCDM baseline
+4. Repeat for fixed iterations and persist results
+
+Run it with:
+
+```bash
+python scripts/run_autonomous_loop.py
+```
+
+Output:
+
+```
+outputs/mkone_autofit.json
+```
+
+Code locations:
+
+- `src/extensions/cosmology_solver.py`
+- `src/automation/agent_loop.py`
+- `tests/test_cosmology_solver.py`
