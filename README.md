@@ -417,3 +417,27 @@ Output:
 ```
 outputs/vireax_center_node.json
 ```
+
+
+## 🔁 Vireax Recursive Research Loop
+
+A mode-driven research engine is available to execute the recursive cycle:
+Interpret → Map → Execute → Analyze → Refine → Store.
+
+Supported modes:
+
+- `simulation`
+- `synthesis`
+- `discovery`
+- `optimization`
+
+Run:
+
+```bash
+python scripts/run_vireax_research.py --mode simulation --iterations 3
+```
+
+Outputs:
+
+- `outputs/vireax_center_node.json`
+- `outputs/vireax_research_log.json`
