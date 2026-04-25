@@ -393,3 +393,27 @@ Code locations:
 - `src/extensions/cosmology_solver.py`
 - `src/automation/agent_loop.py`
 - `tests/test_cosmology_solver.py`
+
+
+---
+
+## 🧭 Vireax Center Node (Unified Hub)
+
+The repository now includes a modular center-node orchestrator that integrates:
+
+- Quantum circuit simulation (`src/vireax/quantum_circuit.py`)
+- EM spectrum ingestion (`src/vireax/data_pipeline.py`)
+- Physics equation lookup/synthesis (`src/vireax/equation_framework.py`)
+- REST-style API transformation layer (`src/vireax/api_layer.py`)
+
+Run end-to-end orchestration:
+
+```bash
+python scripts/run_vireax_center.py
+```
+
+Output:
+
+```
+outputs/vireax_center_node.json
+```
