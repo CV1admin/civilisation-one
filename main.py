@@ -1,3 +1,4 @@
+<<<<<<< codex/update-mk-core
 """Entry point demonstrating the MK core thin-line simulation."""
 from __future__ import annotations
 
@@ -20,3 +21,9 @@ def run_demo(steps: int = 5) -> None:
 
 if __name__ == "__main__":
     run_demo()
+=======
+from stream_bridge import start_quantime_stream
+
+if __name__ == "__main__":
+    start_quantime_stream()
+>>>>>>> main
